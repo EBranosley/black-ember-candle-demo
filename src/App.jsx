@@ -89,6 +89,9 @@ function HeroSmokeHeadline({ className = "", style, onGone, id }) {
 
   const charPhaseClass = phase === "dissolving" ? "hero-char--dissolve" : phase === "gone" ? "hero-char--gone" : "";
 
+  const words = HERO_HEADLINE.split(" ");
+  let delayIndex = 0;
+
   return (
     <h1
       id={id}
@@ -97,14 +100,25 @@ function HeroSmokeHeadline({ className = "", style, onGone, id }) {
       className={`select-none ${className} ${phase === "idle" || phase === "dissolving" ? "cursor-default text-glow-ember" : ""} ${phase === "gone" ? "pointer-events-none" : ""}`}
       onPointerEnter={handlePointerEnter}
     >
-      <span className="inline-flex flex-wrap" aria-hidden>
-        {HERO_HEADLINE.split("").map((ch, i) => (
-          <span
-            key={`${i}-${ch}`}
-            className={`hero-char ${charPhaseClass}`}
-            style={{ animationDelay: `${i * 26}ms` }}
-          >
-            {ch === " " ? "\u00A0" : ch}
+      {/* Word units wrap as wholes; per-letter dissolve timing follows reading order. */}
+      <span
+        className="flex max-w-full flex-wrap justify-center gap-x-[0.35em] gap-y-[0.12em] text-pretty [overflow-wrap:anywhere]"
+        aria-hidden
+      >
+        {words.map((word, wi) => (
+          <span key={`${wi}-${word}`} className="inline-flex max-w-full flex-nowrap">
+            {word.split("").map((ch, ci) => {
+              const di = delayIndex++;
+              return (
+                <span
+                  key={`${wi}-${ci}-${ch}`}
+                  className={`hero-char ${charPhaseClass}`}
+                  style={{ animationDelay: `${di * 26}ms` }}
+                >
+                  {ch}
+                </span>
+              );
+            })}
           </span>
         ))}
       </span>
@@ -143,16 +157,18 @@ function ObjectFrame({ src, alt, className = "" }) {
 
 function HoldingRow({ product }) {
   return (
-    <article className="group grid gap-8 border-b border-white/[0.06] py-16 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:items-center md:gap-14 md:py-20">
+    <article className="group grid min-w-0 gap-8 border-b border-white/[0.06] py-16 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:items-center md:gap-14 md:py-20">
       <ObjectFrame
         src={product.image}
         alt={`${product.name} in low light`}
-        className="aspect-[16/10] md:aspect-[5/3]"
+        className="aspect-[16/10] min-h-0 min-w-0 md:aspect-[5/3]"
       />
-      <div className="max-w-md">
-        <p className="font-display text-[13px] uppercase tracking-[0.28em] text-ember-dim">{product.mood}</p>
-        <h3 className="mt-4 font-display text-4xl font-medium tracking-tight text-stone-100 md:text-5xl">{product.name}</h3>
-        <p className="mt-5 text-sm font-light leading-relaxed text-stone-500">{product.notes}</p>
+      <div className="min-w-0 max-w-md">
+        <p className="font-display text-[clamp(11px,2.6vw,13px)] uppercase tracking-[0.28em] text-ember-dim">{product.mood}</p>
+        <h3 className="mt-4 font-display text-[clamp(1.75rem,3.8vw,3rem)] font-medium tracking-tight text-stone-100">
+          {product.name}
+        </h3>
+        <p className="mt-5 text-[clamp(0.8125rem,1.5vw,0.875rem)] font-light leading-relaxed text-stone-500">{product.notes}</p>
         <div className="mt-10 flex flex-wrap items-baseline gap-6">
           <span className="font-display text-lg text-stone-400">{product.price}</span>
           <button
@@ -203,25 +219,25 @@ export default function App() {
     <div
       className={
         entranceOpen
-          ? "min-h-screen bg-midnight text-stone-200"
-          : "h-[100dvh] max-h-[100dvh] bg-midnight text-stone-200"
+          ? "min-h-screen overflow-x-clip bg-midnight text-stone-200"
+          : "h-[100dvh] max-h-[100dvh] overflow-x-clip bg-midnight text-stone-200"
       }
     >
       <div className="grain" aria-hidden />
 
       {!entranceOpen ? (
         <div
-          className="fixed inset-0 z-[90] flex flex-col items-center justify-center bg-midnight px-[max(1.25rem,env(safe-area-inset-left),env(safe-area-inset-right))] py-8 sm:px-10 md:px-14 vignette-entrance"
+          className="fixed inset-0 z-[90] flex flex-col items-center justify-center overflow-y-auto overscroll-contain bg-midnight px-[max(1rem,env(safe-area-inset-left),env(safe-area-inset-right))] py-[max(2rem,env(safe-area-inset-top),env(safe-area-inset-bottom))] sm:px-10 md:px-14 lg:px-20 vignette-entrance"
           role="dialog"
           aria-modal="true"
           aria-label="Midnight Ember entrance"
           aria-labelledby="entrance-gate-headline"
         >
-          <div className="w-full min-w-0 max-w-[min(100%,52rem)] text-center">
+          <div className="w-full min-w-0 max-w-[min(100%,52rem)] px-1 text-center sm:px-2">
             <HeroSmokeHeadline
               id="entrance-gate-headline"
               onGone={handleEntranceComplete}
-              className="font-display text-[clamp(1.75rem,min(5.8vw,7vh),4.25rem)] font-medium leading-[1.18] tracking-tight text-stone-100 text-glow-ember [text-wrap:balance] px-1 sm:px-2"
+              className="font-display text-[clamp(1.5rem,min(4.2vw,5.5vh),3.75rem)] font-medium leading-[1.22] tracking-tight text-stone-100 text-glow-ember [text-wrap:balance]"
             />
           </div>
         </div>
@@ -234,8 +250,11 @@ export default function App() {
           scrolled ? "bg-midnight/90 py-4 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.9)] backdrop-blur-md" : "bg-transparent py-7"
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 md:px-10">
-          <a href="#" className="font-display text-xl tracking-[0.12em] text-stone-100 md:text-2xl">
+        <div className="mx-auto flex min-w-0 max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(0.5rem,env(safe-area-inset-top))] md:px-10">
+          <a
+            href="#"
+            className="min-w-0 shrink break-words font-display text-[clamp(1rem,min(2.8vw,1.75rem),1.75rem)] tracking-[0.12em] text-stone-100 md:text-2xl lg:text-[clamp(1.5rem,1.4vw,2rem)]"
+          >
             Midnight Ember
           </a>
           <nav className="hidden items-center gap-10 text-[10px] uppercase tracking-[0.24em] text-stone-500 md:flex">
@@ -252,10 +271,10 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative z-10">
-        <div className="relative z-10">
+      <main className="relative z-10 min-w-0 overflow-x-clip">
+        <div className="relative z-10 min-w-0">
           {/* 1 — Mood & atmosphere */}
-          <section className="relative flex flex-col overflow-hidden pb-16 md:pb-24">
+          <section className="relative flex min-w-0 flex-col overflow-x-clip pb-16 md:pb-24">
           <div className="absolute inset-0 bg-midnight" />
           <div
             className="absolute inset-0 z-[2] opacity-90"
@@ -266,8 +285,8 @@ export default function App() {
             aria-hidden
           />
 
-          <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6 md:pt-28">
-            <div className="relative aspect-[5/4] w-full overflow-hidden rounded-sm bg-charcoal shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] sm:aspect-[2/1] md:aspect-[21/9]">
+          <div className="relative z-10 mx-auto w-full min-w-0 max-w-6xl px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-24 sm:px-6 md:pt-28">
+            <div className="relative aspect-[5/4] w-full min-w-0 overflow-hidden rounded-sm bg-charcoal shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] sm:aspect-[2/1] md:aspect-[21/9]">
               <img
                 src={heroAllCandlesBanner}
                 alt="Midnight Ember candle collection"
@@ -289,7 +308,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="relative z-10 mx-auto w-full max-w-5xl px-6 pb-8 pt-8 md:px-10 md:pt-10">
+          <div className="relative z-10 mx-auto w-full min-w-0 max-w-5xl px-[max(1rem,env(safe-area-inset-left))] pb-8 pr-[max(1rem,env(safe-area-inset-right))] pt-8 md:px-10 md:pt-10">
             <h1 className="sr-only">{HERO_HEADLINE}</h1>
             <div
               className="delay-hero-line mx-auto h-px max-w-xs bg-gradient-to-r from-transparent via-ember/35 to-transparent animate-rise"
@@ -300,21 +319,21 @@ export default function App() {
         </section>
 
         {/* 2 — The house */}
-        <section id="house" className="relative border-t border-white/[0.04] bg-charcoal">
-          <div className="mx-auto max-w-3xl px-6 py-28 md:px-10 md:py-36">
+        <section id="house" className="relative min-w-0 overflow-x-clip border-t border-white/[0.04] bg-charcoal">
+          <div className="mx-auto max-w-3xl px-[max(1rem,env(safe-area-inset-left))] py-28 pr-[max(1rem,env(safe-area-inset-right))] md:px-10 md:py-36">
             <p className="text-center text-[10px] uppercase tracking-[0.35em] text-stone-600">The house</p>
-            <h2 className="mt-10 text-center font-display text-[clamp(2rem,4.5vw,3.25rem)] font-medium leading-snug text-stone-100">
+            <h2 className="mt-10 text-balance text-center font-display text-[clamp(1.5rem,3.2vw,3.25rem)] font-medium leading-snug text-stone-100 lg:leading-[1.15]">
               For men who live with discipline, presence, and purpose.
             </h2>
-            <p className="mt-12 text-center text-base font-light leading-[1.85] text-stone-500">
+            <p className="mt-12 text-pretty text-center text-[clamp(0.9375rem,1.6vw,1.0625rem)] font-light leading-[1.85] text-stone-500">
               Black Ember is a community for men who care about the atmosphere they create. Men who value calm over chaos,
               confidence over noise, and refinement over excess. Every scent is designed for masculine spaces that feel
               grounded, intentional, and controlled.
             </p>
           </div>
 
-          <div className="relative mx-auto max-w-6xl px-6 pb-28 md:px-10 md:pb-36">
-            <div className="relative aspect-[21/9] overflow-hidden md:aspect-[2.4/1]">
+          <div className="relative mx-auto max-w-6xl min-w-0 px-[max(1rem,env(safe-area-inset-left))] pb-28 pr-[max(1rem,env(safe-area-inset-right))] md:px-10 md:pb-36">
+            <div className="relative aspect-[16/9] min-w-0 overflow-hidden sm:aspect-[21/9] md:aspect-[2.4/1]">
               <img
                 src={publicUrl("/images/candles/the-house.png")}
                 alt="Black Ember house — atmosphere and space"
@@ -324,23 +343,25 @@ export default function App() {
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-charcoal/80" />
               <div className="absolute inset-0 shadow-[inset_0_0_100px_30px_rgba(0,0,0,0.65)]" />
             </div>
-            <p className="mt-8 text-center font-display text-lg italic text-stone-600 md:text-xl">
+            <p className="mt-8 text-balance text-center font-display text-[clamp(1rem,2vw,1.375rem)] italic leading-snug text-stone-600">
               Close enough to touch the wax. Far enough to forget the hour.
             </p>
           </div>
         </section>
 
         {/* 3 — Scents (products) */}
-        <section id="holdings" className="border-t border-white/[0.04] bg-charcoal">
-          <div className="mx-auto max-w-4xl px-6 pt-24 md:px-10 md:pt-32">
+        <section id="holdings" className="min-w-0 overflow-x-clip border-t border-white/[0.04] bg-charcoal">
+          <div className="mx-auto max-w-4xl px-[max(1rem,env(safe-area-inset-left))] pt-24 pr-[max(1rem,env(safe-area-inset-right))] md:px-10 md:pt-32">
             <p className="text-center text-[10px] uppercase tracking-[0.35em] text-stone-600">Our Presence</p>
-            <h2 className="mt-6 text-center font-display text-4xl text-stone-100 md:text-5xl">Scents of the environment</h2>
-            <p className="mx-auto mt-8 max-w-xl text-center text-sm font-light leading-relaxed text-stone-500">
+            <h2 className="mt-6 text-balance text-center font-display text-[clamp(1.75rem,3.5vw,3.25rem)] text-stone-100">
+              Scents of the environment
+            </h2>
+            <p className="mx-auto mt-8 max-w-xl text-pretty text-center text-[clamp(0.8125rem,1.5vw,0.875rem)] font-light leading-relaxed text-stone-500">
               Every scent earns its place.
             </p>
           </div>
 
-          <div className="mx-auto max-w-5xl px-6 pb-28 md:px-10 md:pb-36">
+          <div className="mx-auto max-w-5xl min-w-0 px-[max(1rem,env(safe-area-inset-left))] pb-28 pr-[max(1rem,env(safe-area-inset-right))] md:px-10 md:pb-36">
             {products.map((product) => (
               <HoldingRow key={product.name} product={product} />
             ))}
@@ -348,9 +369,9 @@ export default function App() {
         </section>
 
         {/* Quiet proof — one line, not a review grid */}
-        <section className="border-t border-white/[0.04] bg-midnight py-24 md:py-28">
-          <blockquote className="mx-auto max-w-2xl px-6 text-center md:px-10">
-            <p className="font-display text-2xl font-normal italic leading-relaxed text-stone-400 md:text-3xl">
+        <section className="min-w-0 overflow-x-clip border-t border-white/[0.04] bg-midnight py-24 md:py-28">
+          <blockquote className="mx-auto max-w-2xl px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] text-center md:px-10">
+            <p className="text-balance font-display text-[clamp(1.25rem,2.4vw,1.875rem)] font-normal italic leading-relaxed text-stone-400">
               You do not rise on noise. You rise on return—day after day, the same standard, until the habit outlasts the
               mood that started it.
             </p>
@@ -359,11 +380,16 @@ export default function App() {
         </section>
 
         {/* Access — dark, not bright Shopify CTA */}
-        <section id="access" className="border-t border-white/[0.04] bg-charcoal px-6 py-24 md:px-10 md:py-32">
-          <div className="mx-auto max-w-3xl border border-white/[0.08] bg-midnight/80 p-10 shadow-[0_0_0_1px_rgba(198,162,74,0.06),0_40px_100px_-40px_rgba(0,0,0,0.9)] md:p-14">
+        <section
+          id="access"
+          className="min-w-0 overflow-x-clip border-t border-white/[0.04] bg-charcoal px-[max(1rem,env(safe-area-inset-left))] py-24 pr-[max(1rem,env(safe-area-inset-right))] md:px-10 md:py-32"
+        >
+          <div className="mx-auto max-w-3xl min-w-0 border border-white/[0.08] bg-midnight/80 p-[clamp(1.5rem,4vw,2.5rem)] shadow-[0_0_0_1px_rgba(198,162,74,0.06),0_40px_100px_-40px_rgba(0,0,0,0.9)] md:p-14">
             <p className="text-[10px] uppercase tracking-[0.32em] text-ember-dim">Private list</p>
-            <h2 className="mt-6 font-display text-3xl text-stone-100 md:text-4xl">If the door opens again, you will know.</h2>
-            <p className="mt-5 text-sm font-light leading-relaxed text-stone-500">
+            <h2 className="mt-6 text-balance font-display text-[clamp(1.5rem,3vw,2.25rem)] text-stone-100">
+              If the door opens again, you will know.
+            </h2>
+            <p className="mt-5 text-pretty text-[clamp(0.8125rem,1.5vw,0.875rem)] font-light leading-relaxed text-stone-500">
               Small releases. No loud restocks. Leave an address and we will reach you when there is something worth the
               descent.
             </p>
@@ -396,10 +422,10 @@ export default function App() {
         <div className="smoke-bg__wisp" />
       </div>
 
-      <footer className="relative z-20 border-t border-white/[0.04] bg-midnight">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-12 text-[10px] uppercase tracking-[0.28em] text-stone-700 md:flex-row md:px-10">
-          <p>© {new Date().getFullYear()} Midnight Ember</p>
-          <p className="max-w-md text-center font-light normal-case tracking-normal text-stone-600 md:text-right">
+      <footer className="relative z-20 min-w-0 overflow-x-clip border-t border-white/[0.04] bg-midnight">
+        <div className="mx-auto flex min-w-0 max-w-6xl flex-col items-center justify-between gap-4 px-[max(1rem,env(safe-area-inset-left))] py-12 pr-[max(1rem,env(safe-area-inset-right))] text-[10px] uppercase tracking-[0.28em] text-stone-700 md:flex-row md:px-10">
+          <p className="text-balance text-center md:text-left">© {new Date().getFullYear()} Midnight Ember</p>
+          <p className="max-w-md text-balance text-center font-light normal-case tracking-normal text-stone-600 md:text-right">
             Atmosphere first. Identity second. Objects third.
           </p>
         </div>
