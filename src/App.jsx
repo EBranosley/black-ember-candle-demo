@@ -386,10 +386,7 @@ export default function App() {
         >
           <div className="mx-auto max-w-3xl min-w-0 border border-white/[0.08] bg-midnight/80 p-[clamp(1.5rem,4vw,2.5rem)] shadow-[0_0_0_1px_rgba(198,162,74,0.06),0_40px_100px_-40px_rgba(0,0,0,0.9)] md:p-14">
             <p className="text-[10px] uppercase tracking-[0.32em] text-ember-dim">Private list</p>
-            <h2 className="mt-6 text-balance font-display text-[clamp(1.5rem,3vw,2.25rem)] text-stone-100">
-              If the door opens again, you will know.
-            </h2>
-            <p className="mt-5 text-pretty text-[clamp(0.8125rem,1.5vw,0.875rem)] font-light leading-relaxed text-stone-500">
+            <p className="mt-6 text-pretty text-[clamp(0.8125rem,1.5vw,0.875rem)] font-light leading-relaxed text-stone-500">
               Small releases. No loud restocks. Leave an address and we will reach you when there is something worth the
               descent.
             </p>
