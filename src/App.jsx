@@ -204,24 +204,24 @@ export default function App() {
       className={
         entranceOpen
           ? "min-h-screen bg-midnight text-stone-200"
-          : "h-[100dvh] max-h-[100dvh] overflow-hidden bg-midnight text-stone-200"
+          : "h-[100dvh] max-h-[100dvh] bg-midnight text-stone-200"
       }
     >
       <div className="grain" aria-hidden />
 
       {!entranceOpen ? (
         <div
-          className="fixed inset-0 z-[90] flex flex-col items-center justify-center bg-midnight px-6 vignette"
+          className="fixed inset-0 z-[90] flex flex-col items-center justify-center bg-midnight px-[max(1.25rem,env(safe-area-inset-left),env(safe-area-inset-right))] py-8 sm:px-10 md:px-14 vignette-entrance"
           role="dialog"
           aria-modal="true"
           aria-label="Midnight Ember entrance"
           aria-labelledby="entrance-gate-headline"
         >
-          <div className="max-w-[min(100%,52rem)] text-center">
+          <div className="w-full min-w-0 max-w-[min(100%,52rem)] text-center">
             <HeroSmokeHeadline
               id="entrance-gate-headline"
               onGone={handleEntranceComplete}
-              className="font-display text-[clamp(2.25rem,7.5vw,5rem)] font-medium leading-[1.08] tracking-tight text-stone-100 text-glow-ember"
+              className="font-display text-[clamp(1.75rem,min(5.8vw,7vh),4.25rem)] font-medium leading-[1.18] tracking-tight text-stone-100 text-glow-ember [text-wrap:balance] px-1 sm:px-2"
             />
           </div>
         </div>
