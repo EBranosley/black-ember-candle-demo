@@ -1,37 +1,43 @@
 import React, { useEffect, useRef, useState } from "react";
 
+/** Public folder paths work on GitHub Pages only when prefixed with Vite's base URL. */
+function publicUrl(path) {
+  const rel = path.startsWith("/") ? path.slice(1) : path;
+  return `${import.meta.env.BASE_URL}${rel}`;
+}
+
 const products = [
   {
     name: "Black Ember",
     notes: "Smoked cedar, amber, charred wood, dark musk",
     mood: "Smoke · warmth · depth",
     price: "$28",
-    image: "/images/candles/black-ember.png",
+    image: publicUrl("/images/candles/black-ember.png"),
   },
   {
     name: "Ironwood",
     notes: "Oak, leather, sandalwood, warm spice",
     mood: "Wood · leather · still air",
     price: "$28",
-    image: "/images/candles/ironwood.png",
+    image: publicUrl("/images/candles/ironwood.png"),
   },
   {
     name: "The Stoic",
     notes: "Cedar, bergamot, tobacco leaf, clean musk",
     mood: "Quiet · focus · low light",
     price: "$30",
-    image: "/images/candles/the-stoic.png",
+    image: publicUrl("/images/candles/the-stoic.png"),
   },
   {
     name: "Midnight Leather",
     notes: "Dark leather, vanilla smoke, tonka, mahogany",
     mood: "Late hours · closeness",
     price: "$30",
-    image: "/images/candles/midnight-leather.png",
+    image: publicUrl("/images/candles/midnight-leather.png"),
   },
 ];
 
-const heroAllCandlesBanner = "/images/candles/all-candles-banner.png";
+const heroAllCandlesBanner = publicUrl("/images/candles/all-candles-banner.png");
 
 const HERO_HEADLINE = "You weren't supposed to find this place.";
 
@@ -312,7 +318,7 @@ export default function App() {
           <div className="relative mx-auto max-w-6xl px-6 pb-28 md:px-10 md:pb-36">
             <div className="relative aspect-[21/9] overflow-hidden md:aspect-[2.4/1]">
               <img
-                src="/images/candles/the-house.png"
+                src={publicUrl("/images/candles/the-house.png")}
                 alt="Black Ember house — atmosphere and space"
                 className="h-full w-full object-cover object-center opacity-85"
                 loading="lazy"
