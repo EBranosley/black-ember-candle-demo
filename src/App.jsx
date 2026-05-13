@@ -214,17 +214,15 @@ export default function App() {
           className="fixed inset-0 z-[90] flex flex-col items-center justify-center bg-midnight px-6 vignette"
           role="dialog"
           aria-modal="true"
-          aria-label="Midnight Ember pre-home screen. Hover the headline to enter the site."
+          aria-label="Midnight Ember entrance"
           aria-labelledby="entrance-gate-headline"
         >
           <div className="max-w-[min(100%,52rem)] text-center">
-            <p className="mb-8 text-[10px] uppercase tracking-[0.35em] text-stone-600">Pre-home</p>
             <HeroSmokeHeadline
               id="entrance-gate-headline"
               onGone={handleEntranceComplete}
               className="font-display text-[clamp(2.25rem,7.5vw,5rem)] font-medium leading-[1.08] tracking-tight text-stone-100 text-glow-ember"
             />
-            <p className="mt-10 text-[10px] uppercase tracking-[0.32em] text-stone-600">Hover the headline to enter the site</p>
           </div>
         </div>
       ) : null}
